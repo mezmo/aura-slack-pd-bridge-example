@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aura-bridge
+  labels:
+    app.kubernetes.io/name: aura-bridge
+spec:
+  selector:
+    app.kubernetes.io/name: aura-bridge
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

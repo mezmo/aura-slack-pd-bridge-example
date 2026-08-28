@@ -1,0 +1,34 @@
+# Internet-facing Ingress so PagerDuty's incident workflow can reach the
+# webhook. Only /webhooks is routed — the admin API and everything else stay
+# cluster-internal — and the webhook itself requires the X-Bridge-Token shared
+# token. Optionally restrict the source to PagerDuty's safelist IPs:
+# https://support.pagerduty.com/main/docs/safelist-ips
+#
+# Annotations below are for the AWS Load Balancer Controller; swap the
+# ingressClassName and annotations for your controller. TLS certificates and
+# DNS are left to your setup.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aura-bridge
+  labels:
+    app.kubernetes.io/name: aura-bridge
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+spec:
+  ingressClassName: alb
+  rules:
+    - host: aura-bridge.example.com
+      http:
+        paths:
+          - path: /webhooks
+            pathType: Prefix
+            backend:
+              service:
+                name: aura-bridge
+                port:
+                  number: 80

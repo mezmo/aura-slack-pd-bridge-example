@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "tools",
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": ["tools"]
+}
